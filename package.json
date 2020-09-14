@@ -1,0 +1,26 @@
+{
+  "name": "servlette",
+  "version": "1.0.0",
+  "description": "Synchronous HTTP Web Server for Node",
+  "main": "servlette",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gardhr/servlette.git"
+  },
+  "homepage": "https://github.com/gardhr/servlette#readme",
+  "author": "Gardhr",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gardhr/servlette/issues"
+  },
+  "dependencies": {
+    "command-line-args": "*",
+    "command-line-usage": "*",
+    "cookie": "*",
+    "jalosi": "*"
+  },
+  "keywords": [
+    "http server"
+  ],
+  "bin": "./servlette"
+}

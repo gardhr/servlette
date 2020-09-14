@@ -1,0 +1,82 @@
+{
+  startup: console.log("Now open your browser and go to http://127.0.0.1:2784"),
+   
+  /* Defaults to 80 (http) or 443 (https) */
+
+  port: 2784,
+
+  /* 
+     Bind demo to localhost only. 
+ 
+     This can be undefined in most cases (default: "0.0.0.0") 
+*/
+
+  address: "127.0.0.1",
+
+  /* 
+     A string, array of strings, or comma-separated 
+     string of directories to serve files from. 
+     
+     Warning: World-visible!
+*/
+
+  root: "public",
+
+  /* 
+     A string, array of strings, or comma-separated
+     string of directories to run scripts from.
+     
+     Warning: World-executable!
+*/
+
+  scripts: "scripts",
+
+  /* 
+     This can usually be undefined, defaults to "./" 
+*/
+
+  path: "./",
+
+  /* 
+     SSL private key.
+  
+     If not specified, a file named "key.pem" will be used (if exists)
+  
+    (Note: This can be actual key text) 
+*/
+
+  key: null,
+
+  /* 
+     SSL public key.
+  
+     If not specified, a file named "cert.pem" will be used (if exists)
+  
+     (Note: This can be actual key text) 
+*/
+
+  cert: null,
+
+  /* 
+     SSL Certificate Authority (CA) key(s).
+
+     if not specified, a file named "ca.pem" will be used (if exists)
+
+     (Note: This can be actual key text, or even an array of such)     
+*/
+
+  ca: null,
+
+  /*
+
+     Filter to apply to all routes. (File path or function)
+*/
+
+  filter: "private/filter.js",
+
+  /*
+     True, false, or function.
+*/
+
+  verbose: console.log,
+}

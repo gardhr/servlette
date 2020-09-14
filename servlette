@@ -1,0 +1,172 @@
+#!/usr/bin/env node
+
+"use strict";
+
+const { statSync, readFileSync, writeFileSync } = require("fs");
+const servlette = require("./servlette.js");
+const jalosi = require("jalosi");
+const commandLineArgs = require("command-line-args");
+const commandLineUsage = require("command-line-usage");
+const log = console.log;
+
+const optionList = [
+  {
+    name: "help",
+    description: "Show this help message",
+    alias: "h",
+    type: Boolean,
+  },
+  {
+    name: "verbose",
+    alias: "v",
+    description: "Generate debugging output (true, false, or function)",
+    type: String,
+  },
+  {
+    name: "port",
+    description: "Port to listen on (default: 80 [http], 443 [https])",
+    alias: "p",
+    type: Number,
+  },
+  {
+    name: "address",
+    description: "Address to bind to (default: 0.0.0.0)",
+    alias: "a",
+    type: String,
+  },
+  {
+    name: "base",
+    alias: "b",
+    description: "Base path to be prepended to ALL file system paths",
+    type: String,
+  },
+  {
+    name: "root",
+    alias: "r",
+    description: "Directory to serve files from (can be multiple)",
+    type: String,
+    multiple: true,
+  },
+  {
+    name: "scripts",
+    alias: "s",
+    description: "Directory to run scripts from (can be multiple)",
+    type: String,
+    multiple: true,
+  },
+  {
+    name: "missing",
+    alias: "m",
+    description:
+      "HTTP 404 Response; string, function, or file (relative to 'base' path)",
+    type: String,
+  },
+  {
+    name: "filter",
+    alias: "f",
+    description:
+      "Handler for all routes; string, function, or file (relative to 'base' path)",
+    type: String,
+  },
+  {
+    name: "key",
+    description:
+      "SSL private key file or string (defaults to insecure HTTP if not set)",
+    type: String,
+  },
+  {
+    name: "cert",
+    description:
+      "SSL certificate file or string (defaults to insecure HTTP if not set)",
+    type: String,
+  },
+  {
+    name: "ca",
+    description: "SSL certificate authority file(s) or string(s)",
+    type: String,
+    multiple: true,
+  },
+  {
+    name: "config",
+    alias: "c",
+    description:
+      "Configuration file containing server settings (default: servlette.jso)",
+    type: String,
+  },
+];
+
+function usage(error) {
+  if (error) log("Error:", error);
+  log(
+    commandLineUsage([
+      {
+        header: "Servlette",
+        content: "Synchronous HTTP Server for Node",
+      },
+      {
+        header: "Options",
+        optionList: optionList,
+      },
+      {
+        content:
+          "Project home: {underline https://github.com/gardhr/servlette}",
+      },
+    ])
+  );
+}
+
+function fileExists(fileName) {
+  try {
+    return statSync(fileName).isFile();
+  } catch (ignored) {
+    return false;
+  }
+}
+
+const readFileText = (fileName) => readFileSync(fileName, "utf-8");
+
+var settings = {};
+
+try {
+  var options = commandLineArgs(optionList);
+
+  if (options.config === undefined && fileExists("servlette.jso"))
+    options.config = "servlette.jso";
+  if (options.config !== undefined) {
+    let data = options.config;
+    if (data != "false") {
+      if (data == "true") data = "servlette.jso";     
+      settings = jalosi.load(data);       
+    }
+  }
+
+  if (options.verbose === null) options.verbose = "true";
+  if (options.verbose) options.verbose = jalosi.run(options.verbose);
+
+  let showHelp = true;
+  for (let option in options) showHelp = false;
+  if (showHelp) return usage();
+  delete options.help;
+
+  for (let option in options) settings[option] = options[option];
+
+  let keys = settings.keys || settings;
+  var arr = ["key", "cert", "ca"];
+  for (let adx in arr) {
+    var tag = arr[adx];
+    let file = keys[tag] && keys[tag] != "" ? keys[tag] : tag + ".pem";
+    if (fileExists(file)) keys[tag] = readFileText(file);
+  }
+} catch (error) {
+  return usage(error);
+}
+
+process.on("SIGINT", function () {
+  log();
+  log("Shutting down...");
+  server.stop();
+  process.exit();
+});
+
+var server = servlette();
+server.start(settings);
