@@ -1,7 +1,3 @@
-/*
-   TODO: Strip/ignore trailing semicolens?
-
-*/
 module.exports = function (configured) {
   const http = require("http");
   const https = require("https");
@@ -90,15 +86,17 @@ module.exports = function (configured) {
   }
 
   function dispatchRoute(servlette, route, scriptDirs, rootDirs) {
-    if (typeof route === "function") return route(servlette, request, response);
+    if (typeof route === "function") return route(servlette, servlette.request, servlette.response);
     let router = configured.routes;
-    if (router.hasOwnProperty(route)) {
-      let handler = router[route];
+    let sub = route;
+if (sub.startsWith("/")) sub = sub.substr(1);  
+    if (router.hasOwnProperty(sub)) {
+      let handler = router[sub];
       let type = typeof handler;
       if (type === "function")
-        return dispatchRoute(servlette, handler, scriptDirs, rootDirs);
+        return handler(servlette, servlette.request, servlette.response);         
       else if (type === "object") {
-        let method = servlette.method.toLowerCase();
+        let method = servlette.method.toLowerCase(); 
         if (handler.hasOwnProperty(method)) {
           return dispatchRoute(
             servlette,
@@ -204,7 +202,7 @@ module.exports = function (configured) {
         let position = 0;
         for (let umx = url.length; position < umx; ++position)
           if (char(url, position) == needle) break;
-        let route = sanitizeRoute(normalize(url.substr(0, position)));
+        let route = sanitizeRoute(normalize(url.substr(0, position)));     
         let preprocessed = url.substr(position + 1);
         let object = decodeQueryString(preprocessed);
         let query = {};
@@ -264,7 +262,7 @@ module.exports = function (configured) {
           if (configured.routes.filter)
             filterHandled = handleRoute(servlette, "filter", specials);
 
-          if (filterHandled === undefined)
+          if (!filterHandled)
             indexHandled = handleRoute(
               servlette,
               route,
