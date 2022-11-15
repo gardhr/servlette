@@ -86,17 +86,18 @@ module.exports = function (configured) {
   }
 
   function dispatchRoute(servlette, route, scriptDirs, rootDirs) {
-    if (typeof route === "function") return route(servlette, servlette.request, servlette.response);
+    if (typeof route === "function")
+      return route(servlette, servlette.request, servlette.response);
     let router = configured.routes;
     let sub = route;
-if (sub.startsWith("/")) sub = sub.substr(1);  
+    if (sub.startsWith("/")) sub = sub.substr(1);
     if (router.hasOwnProperty(sub)) {
       let handler = router[sub];
       let type = typeof handler;
       if (type === "function")
-        return handler(servlette, servlette.request, servlette.response);         
+        return handler(servlette, servlette.request, servlette.response);
       else if (type === "object") {
-        let method = servlette.method.toLowerCase(); 
+        let method = servlette.method.toLowerCase();
         if (handler.hasOwnProperty(method)) {
           return dispatchRoute(
             servlette,
@@ -145,15 +146,18 @@ if (sub.startsWith("/")) sub = sub.substr(1);
     verbose("event: [serve]");
 
     if (!request.servlette) {
-      let servlette = (request.servlette = response.servlette = {
-        headers_: {},
-        output_: [],
-        all_cookies_: [],
-        post: null,
-        status_: 200,
-        request: request,
-        response: response,
-      });
+      let servlette =
+        (request.servlette =
+        response.servlette =
+          {
+            headers_: {},
+            output_: [],
+            all_cookies_: [],
+            post: null,
+            status_: 200,
+            request: request,
+            response: response,
+          });
 
       function status(code) {
         servlette.status_ = code;
@@ -202,7 +206,7 @@ if (sub.startsWith("/")) sub = sub.substr(1);
         let position = 0;
         for (let umx = url.length; position < umx; ++position)
           if (char(url, position) == needle) break;
-        let route = sanitizeRoute(normalize(url.substr(0, position)));     
+        let route = sanitizeRoute(normalize(url.substr(0, position)));
         let preprocessed = url.substr(position + 1);
         let object = decodeQueryString(preprocessed);
         let query = {};
