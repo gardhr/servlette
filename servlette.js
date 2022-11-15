@@ -262,7 +262,7 @@ if (sub.startsWith("/")) sub = sub.substr(1);
           if (configured.routes.filter)
             filterHandled = handleRoute(servlette, "filter", specials);
 
-          if (!filterHandled)
+          if (filterHandled === undefined)
             indexHandled = handleRoute(
               servlette,
               route,
