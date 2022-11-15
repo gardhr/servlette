@@ -1,6 +1,6 @@
 {
   "name": "servlette",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Synchronous HTTP Web Server for Node",
   "main": "servlette",
   "repository": {
